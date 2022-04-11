@@ -7,7 +7,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 
-import com.vietshop.entity.Category;
+import com.vietshop.Entity.Category;
+import com.vietshop.dto.CategoryDTO;
 
 public interface iCategoryService {
 
@@ -49,7 +50,7 @@ public interface iCategoryService {
 
 	List<Category> findAll(Sort sort);
 
-	Category findOne(Long id);
+	CategoryDTO findOne(Long id);
 
 	List<Category> findAll();
 

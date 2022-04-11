@@ -2,7 +2,6 @@ package com.vietshop.Service.impl;
 
 import java.io.File;
 import java.io.IOException;
-import java.text.DecimalFormat;
 import java.util.List;
 import java.util.Optional;
 
@@ -13,13 +12,14 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.vietshop.Entity.Category;
 import com.vietshop.Entity.Product;
 import com.vietshop.Service.iProductService;
+import com.vietshop.dto.CategoryDTO;
 import com.vietshop.dto.ProductDTO;
+import com.vietshop.repository.CategoryRepository;
 import com.vietshop.repository.ProductRepository;
 
 @Service // Để class có thể thực hiện cơ chế DI và IOC
@@ -30,6 +30,9 @@ public class ProductService implements iProductService {
 
 	@Autowired
 	private ProductRepository productRepository;
+	
+	@Autowired
+	private CategoryRepository categoryRepository;
 	@Override
 	public <S extends Product> S save(S entity) {
 		return productRepository.save(entity);
@@ -40,9 +43,16 @@ public class ProductService implements iProductService {
 		return productRepository.findOne(example);
 	}
 
-	@Override
-	public Page<Product> findAllProduct(Pageable pageable) {
-		return productRepository.findAllProduct(pageable);
+	
+	public Page<ProductDTO> findAllProduct(Pageable pageable) {
+		
+		Page<ProductDTO> pageAllProduct = productRepository.findAllProduct(pageable).map(Product->{
+			ProductDTO productDTO = new ProductDTO();
+			BeanUtils.copyProperties(Product, productDTO);
+			return productDTO;
+		});
+		return pageAllProduct;
+		
 	}
 
 	@Override
@@ -72,9 +82,17 @@ public class ProductService implements iProductService {
 		return productRepository.findAllByIdCategory(status,idCategory, pageable);
 	}
 	
-	@Override
-	public Page<Product> findAllByIdCategoryAll(Category category, Pageable pageable) {
-		return productRepository.findByCategory(category, pageable);
+	
+	public Page<ProductDTO> findAllByCategory(CategoryDTO categoryDTO, Pageable pageable) {
+		Category category = new Category();
+		BeanUtils.copyProperties(categoryDTO, category);
+		Page<ProductDTO> pageProductDTO = productRepository.findByCategory(category, pageable).map(Product->{
+			ProductDTO productDTO = new ProductDTO();
+			BeanUtils.copyProperties(Product, productDTO);
+			return productDTO;
+		});
+				return pageProductDTO;
+	
 	}
 
 	@Override
@@ -137,9 +155,12 @@ public class ProductService implements iProductService {
 		productRepository.delete(entity);
 	}
 
-	@Override
-	public Product getOne(Long id) {
-		return productRepository.getOne(id);
+	
+	public ProductDTO getOne(Long id) {
+		Product product = productRepository.findOne(id);
+		ProductDTO productDTO = new ProductDTO();
+		BeanUtils.copyProperties(product, productDTO);
+		return productDTO;
 	}
 
 	@Override
@@ -177,9 +198,14 @@ public class ProductService implements iProductService {
 	
 	
 
-	@Override
-	public Page<Product> searchProduct(String keyword,Pageable pageable) {
-		return productRepository.searchProduct(keyword,pageable);
+	public Page<ProductDTO> searchProduct(Optional<String> keyword,Pageable pageable) {
+		Page<ProductDTO> pageProductDTO = productRepository.searchProduct(keyword.get(),pageable).map(Product ->{
+			ProductDTO productDTO = new ProductDTO();
+			BeanUtils.copyProperties(Product, productDTO);
+			return productDTO;
+		});
+		return pageProductDTO;
+		
 	}
 
 	@Override
@@ -256,6 +282,7 @@ public class ProductService implements iProductService {
 		return productRepository.findTopProduct(status,page);
 	}
 	
+	
 	public ProductDTO getProductDTO(Long idProduct) {
 		Product product = productRepository.getOne(idProduct);
 		ProductDTO productDTO = new ProductDTO();
@@ -263,10 +290,71 @@ public class ProductService implements iProductService {
 		BeanUtils.copyProperties(product, productDTO);
 		return productDTO;
 	}
+	
+	
 	public void changeStatus(ProductDTO productDTO) {
 		Product product = new Product();
 		BeanUtils.copyProperties(productDTO, product);
 		productRepository.save(product);
+	}
+	
+	public void updateProduct(ProductDTO productDTO,Long addQuantity) {
+		Product product = productRepository.getOne(productDTO.getIdProduct()); // Get ra entity có id theo DTO nhận từ view
+
+		productDTO.setQuantity(product.getQuantity() + addQuantity);// Theem so luong sp
+		productDTO.setStatus(product.getStatus());
+		productDTO.setSoldQuantity(product.getSoldQuantity());
+
+		Category category = categoryRepository.getOne(productDTO.getIdCategory());
+		product.setCategory(category);
+		String saveImgUrl = "/Users/macbook/eclipse-workspace/vietshop/src/main/webapp/resources/images";
+//		String saveImgUrl = "D:/Java/workspace/vietshop/src/main/webapp/resources/images";
+
+		try {
+			MultipartFile multipartFile = productDTO.getImageFile();
+			String fileImg = multipartFile.getOriginalFilename();
+			File file = new File(saveImgUrl, fileImg);
+			multipartFile.transferTo(file);
+			productDTO.setImgUrl("/resources/images/" + fileImg);// Set đường dẫn lưu trên DB
+			System.out.println(productDTO.getImgUrl());
+
+		} catch (Exception e) {
+			System.out.println(e);
+		}
+		
+		if(productDTO.getImageFile().isEmpty()) {
+			productDTO.setImgUrl(product.getImgUrl());
+		}
+
+		BeanUtils.copyProperties(productDTO, product);
+		productRepository.save(product);
+
+	}
+	
+	
+	public void doHideProduct(Long idProduct) {
+		Product product = productRepository.getOne(idProduct);
+		product.setStatus("hide");
+		productRepository.save(product);
+	}
+	
+	
+	public void doDisplayProduct(Long idProduct) {
+		Product product = productRepository.getOne(idProduct);
+		product.setStatus("display");
+		productRepository.save(product);
+	}
+
+	@Override
+	public Page<Product> searchProduct(String keyword, Pageable pageable) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Page<ProductDTO> findAllByIdCategoryAll(Category category, Pageable pageable) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 	
 }

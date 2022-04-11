@@ -20,15 +20,18 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import com.vietshop.Service.imp.AccountService;
-import com.vietshop.Service.imp.CategoryService;
-import com.vietshop.Service.imp.ProductService;
-import com.vietshop.entity.Account;
-import com.vietshop.entity.CartItem;
-import com.vietshop.entity.Category;
-import com.vietshop.entity.Product;
 import com.vietshop.repository.CartItemRepository;
+import com.vietshop.Entity.Account;
+import com.vietshop.Entity.CartItem;
+import com.vietshop.Entity.Category;
+import com.vietshop.Entity.Product;
 import com.vietshop.Service.iProductService;
+import com.vietshop.Service.impl.AccountService;
+import com.vietshop.Service.impl.CartItemService;
+import com.vietshop.Service.impl.CategoryService;
+import com.vietshop.Service.impl.ProductService;
+import com.vietshop.dto.AccountDTO;
+import com.vietshop.dto.CategoryDTO;
 import com.vietshop.util.SecurityUtils;
 
 @Controller(value = "productControllerOfWeb")
@@ -42,7 +45,7 @@ public class productController {
 	@Autowired
 	private AccountService accountService;
 	@Autowired
-	private CartItemRepository cartItemRepository;
+	private CartItemService cartItemService;
 
 	@RequestMapping(value = "/shop-grid", method = RequestMethod.GET)
 	public String shopGrid(Model model, @RequestParam("p") Optional<Integer> p,
@@ -85,7 +88,7 @@ public class productController {
 
 		// code hiển thị thong tin giỏ hàng
 		try {
-			Account account = accountService.findByUserName(SecurityUtils.getPrincipal().getUsername());
+			AccountDTO account = accountService.findByUserName(SecurityUtils.getPrincipal().getUsername());
 			if (account != null) {
 				List<CartItem> items = account.getCartItems();
 				if (items == null) {
@@ -160,7 +163,7 @@ public class productController {
 		model.addAttribute("product", productPage);
 		model.addAttribute("idCategory", idCategory);
 		model.addAttribute("category", category);
-		Category cate = categoryService.findOne(idCategory);
+		CategoryDTO cate = categoryService.findOne(idCategory);
 		model.addAttribute("cateName", cate);
 		model.addAttribute("sorter", sort.get());
 		System.out.println(sort.get());
@@ -172,7 +175,7 @@ public class productController {
 		model.addAttribute("formatter", formatter);
 		// code hiển thị thong tin giỏ hàng
 		try {
-			Account account = accountService.findByUserName(SecurityUtils.getPrincipal().getUsername());
+			AccountDTO account = accountService.findByUserName(SecurityUtils.getPrincipal().getUsername());
 			if (account != null) {
 				List<CartItem> items = account.getCartItems();
 				if (items == null) {
@@ -218,6 +221,7 @@ public class productController {
 		model.addAttribute("lastProduct2", lastProduct2);
 		return "web/shopGridByCategory";
 	}
+	
 
 	@GetMapping("/product-detail")
 	public String productDetail(Model model, @RequestParam("idProduct") Long idProduct,
@@ -245,7 +249,7 @@ public class productController {
 
 		// code hiển thị thong tin giỏ hàng
 		try {
-			Account account = accountService.findByUserName(SecurityUtils.getPrincipal().getUsername());
+			AccountDTO account = accountService.findByUserName(SecurityUtils.getPrincipal().getUsername());
 			if (account != null) {
 				List<CartItem> items = account.getCartItems();
 				if (items == null) {
@@ -273,31 +277,7 @@ public class productController {
 	public String addProductDetail(Model model,@RequestParam("idProduct") Long idProduct,@RequestParam("quantity") Long quantity,HttpSession session) {
 		
 		try {
-		Account account = accountService.findByUserName(SecurityUtils.getPrincipal().getUsername());
-
-		Long addQuantity = quantity ;
-		Product product = productService.findByIdProduct(idProduct).get();
-		CartItem cartItem = cartItemRepository.findByAccountAndProduct(account, product);
-		
-		if(cartItem !=null ) {
-			addQuantity = cartItem.getQuantity()+quantity;
-			cartItem.setQuantity(addQuantity);
-			double total = cartItem.getQuantity()*product.getCost();
-			cartItem.setTotal(total);
-			
-			
-			
-		}else {
-			
-			cartItem = new CartItem();
-			cartItem.setAccount(account);
-			cartItem.setProduct(product);
-			cartItem.setQuantity(quantity);
-			double total = cartItem.getQuantity()*product.getCost();
-			cartItem.setTotal(total);
-			System.out.println(quantity+"aasas");
-		}
-		cartItemRepository.save(cartItem);
+			cartItemService.doAddProductToCart(idProduct, quantity);
 		}
 		catch (Exception e) {
 			   return "redirect:/authen";
@@ -309,7 +289,7 @@ public class productController {
 			model.addAttribute("formatter", formatter);
 			
 			try {
-				Account account = accountService.findByUserName(SecurityUtils.getPrincipal().getUsername());
+				AccountDTO account = accountService.findByUserName(SecurityUtils.getPrincipal().getUsername());
 				if (account != null) {
 					List<CartItem> items = account.getCartItems();
 					if (items == null) {

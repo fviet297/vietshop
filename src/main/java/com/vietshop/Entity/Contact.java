@@ -1,4 +1,4 @@
-package com.vietshop.entity;
+package com.vietshop.Entity;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;

@@ -14,10 +14,10 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.vietshop.Entity.Category;
-import com.vietshop.Service.iCategoryService;
 import com.vietshop.dto.CategoryDTO;
 import com.vietshop.repository.CategoryRepository;
+import com.vietshop.Entity.Category;
+import com.vietshop.Service.iCategoryService;
 
 @Service // Để class có thể thực hiện cơ chế DI và IOC
 public class CategoryService implements iCategoryService {
@@ -45,8 +45,12 @@ public class CategoryService implements iCategoryService {
 	}
 
 	@Override
-	public Category findOne(Long id) {
-		return categoryRepository.findOne(id);
+	public CategoryDTO findOne(Long id) {
+		Category category = categoryRepository.findOne(id);
+		CategoryDTO categoryDTO = new CategoryDTO();
+		BeanUtils.copyProperties(category, categoryDTO);
+		
+		return categoryDTO;
 	}
 
 	@Override
@@ -208,7 +212,6 @@ public class CategoryService implements iCategoryService {
 		}
 		
 		BeanUtils.copyProperties(categoryDTO, category);
-
 		categoryRepository.save(category);
 	}
 }

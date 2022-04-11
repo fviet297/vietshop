@@ -16,13 +16,13 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import com.vietshop.Entity.Account;
+import com.vietshop.Entity.Order;
+import com.vietshop.Entity.OrderDetails;
 import com.vietshop.Service.iAccountService;
-import com.vietshop.Service.imp.OrderService;
-import com.vietshop.Service.imp.ShoppingCartService;
+import com.vietshop.Service.impl.OrderService;
+import com.vietshop.Service.impl.ShoppingCartService;
 import com.vietshop.dto.AccountDTO;
-import com.vietshop.entity.Account;
-import com.vietshop.entity.Order;
-import com.vietshop.entity.OrderDetails;
 import com.vietshop.repository.CartItemRepository;
 import com.vietshop.repository.ProductRepository;
 import com.vietshop.util.SecurityUtils;
@@ -47,14 +47,16 @@ public class profileController {
 
 	@GetMapping("/profile")
 	public String profile(Model model,@RequestParam(name = "mess",defaultValue = " ") String mess) {
-		Account account = accountService.findByUserName(SecurityUtils.getPrincipal().getUsername());
+		AccountDTO account = accountService.findByUserName(SecurityUtils.getPrincipal().getUsername());
 		model.addAttribute("account",account);
 		model.addAttribute("mess",mess);// mess cho method post change password
 		SecurityUtils.getPrincipal().getPassword();
 		return "web/profile";
 	}
+	
+	
 	@PostMapping("/updateProfile")
-	public String updateProfile(Model model,@ModelAttribute("account") Account account) {
+	public String updateProfile(Model model,@ModelAttribute("account") AccountDTO account) {
 		Account acc = accountService.findOne(account.getId());
 		acc.setFullName(account.getFullName());
 		acc.setEmail(account.getEmail());
@@ -64,6 +66,7 @@ public class profileController {
 		
 		return "redirect:/profile";
 	}
+	
 	
 	@PostMapping("/changePassword")
 	public String changePassword(Model model,@ModelAttribute("account") AccountDTO account) {
@@ -79,6 +82,8 @@ public class profileController {
 		return "redirect:/profile";
 		}
 	}
+	
+	
 	@GetMapping("/myorderdetail")
 	public String myorderdetail(Model model,@RequestParam("idOrder") Long idOrder) {
 		List<OrderDetails> items = orderService.findOne(idOrder).getOrderDetailsList();
@@ -89,6 +94,7 @@ public class profileController {
 		model.addAttribute("formatter",formatter);
 		return "web/myOrder";
 	}
+	
 	
 	@GetMapping("/mylistorder")
 	public String mylistorder(Model model,@RequestParam("p") Optional<Integer> p ) {

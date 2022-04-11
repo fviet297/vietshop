@@ -9,9 +9,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import com.vietshop.repository.ContactRepository;
 import com.vietshop.Entity.Contact;
 import com.vietshop.Service.iContactService;
-import com.vietshop.repository.ContactRepository;
 
 @Service // Để class có thể thực hiện cơ chế DI và IOC
 public class ContactService implements iContactService{

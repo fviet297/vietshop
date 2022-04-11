@@ -23,12 +23,13 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import com.vietshop.Service.imp.AccountService;
+import com.vietshop.Entity.Account;
+import com.vietshop.Service.impl.AccountService;
 import com.vietshop.dto.AccountDTO;
-import com.vietshop.entity.Account;
 
 @Controller
 public class accountController {
+	
 	@Autowired
 	private AccountService accountService;
 
@@ -116,7 +117,7 @@ public class accountController {
 			MimeMessage message = emailSender.createMimeMessage();
 			boolean multipart = true;
 
-			MimeMessageHelper helper = new MimeMessageHelper(message, multipart, "utf-8");
+			MimeMessageHelper helper = new MimeMessageHelper(message, multipart, "Unicode (UTF-8)");
 			String htmlMsg = "<a>Đăng ký tài khoản vShop thành công</a>" + "<br>"
 					+ "<a href='http://localhost:8080/vietshop/trang-chu'>Go to vShop</a>";
 

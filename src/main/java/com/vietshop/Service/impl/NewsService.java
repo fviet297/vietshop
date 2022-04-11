@@ -9,9 +9,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import com.vietshop.repository.NewsRepository;
 import com.vietshop.Entity.News;
 import com.vietshop.Service.iNewsService;
-import com.vietshop.repository.NewsRepository;
 
 @Service // Để class có thể thực hiện cơ chế DI và IOC
 public class NewsService implements iNewsService{

@@ -30,17 +30,19 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
-import com.vietshop.Service.imp.CategoryService;
-import com.vietshop.Service.imp.OrderService;
-import com.vietshop.Service.imp.ProductService;
-import com.vietshop.Service.imp.RoleService;
-import com.vietshop.entity.Account;
-import com.vietshop.entity.CartItem;
-import com.vietshop.entity.Category;
-import com.vietshop.entity.Product;
-import com.vietshop.entity.Role;
 import com.vietshop.repository.CartItemRepository;
+import com.vietshop.Entity.Account;
+import com.vietshop.Entity.CartItem;
+import com.vietshop.Entity.Category;
+import com.vietshop.Entity.Product;
+import com.vietshop.Entity.Role;
 import com.vietshop.Service.iAccountService;
+import com.vietshop.Service.impl.CartItemService;
+import com.vietshop.Service.impl.CategoryService;
+import com.vietshop.Service.impl.OrderService;
+import com.vietshop.Service.impl.ProductService;
+import com.vietshop.Service.impl.RoleService;
+import com.vietshop.dto.AccountDTO;
 import com.vietshop.util.SecurityUtils;
 
 
@@ -59,7 +61,7 @@ public class homeController {
 	@Autowired
 	public ProductService productService;
 	@Autowired
-	private CartItemRepository cartItemRepository;
+	private CartItemService cartItemService;
 	@Autowired
     public JavaMailSender emailSender;
 
@@ -72,7 +74,7 @@ public class homeController {
 				model.addAttribute("category",cate);
 				// code hien thi thong tin gio hang tren header
 				try {
-				Account account = accountService.findByUserName(SecurityUtils.getPrincipal().getUsername());
+				AccountDTO account = accountService.findByUserName(SecurityUtils.getPrincipal().getUsername());
 				List<CartItem> items = account.getCartItems();
 				model.addAttribute("cartItems",items);
 				model.addAttribute("account",account);
@@ -163,30 +165,27 @@ public class homeController {
 					"<a href='http://localhost:8080/vietshop/trang-chu'>Go to vShop</a>";   
 	        message.setContent(htmlMsg, "text/html");
 	        helper.setTo(newAcc.getEmail());
-	        
 	        helper.setSubject("Đăng ký tài khoản vShop thành công");
-	        
-
 	        this.emailSender.send(message);
 	} catch(Exception e) {
 		return "Error";
 	}
-
-	  
-	   return "redirect:/authen";
-	   
+	   return "redirect:/authen";	   
    }
+   
+   
    @RequestMapping(value = "/authen", method = RequestMethod.GET)
    public String loginPage(Model model) {
 	   //Khac phuc bug vao duoc trang login khi da login
 	  try {
-		  Account account = accountService.findByUserName(SecurityUtils.getPrincipal().getUsername());
+		  AccountDTO account = accountService.findByUserName(SecurityUtils.getPrincipal().getUsername());
 	  }catch ( Exception e) {
 		  return "login";
 	  }
 	  return "redirect:trang-chu";
-	  
    }
+   
+   
    @RequestMapping(value = "/thoat", method = RequestMethod.GET)
 	public ModelAndView logout(HttpServletRequest request, HttpServletResponse response) {
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -195,45 +194,23 @@ public class homeController {
 		}
 		return new ModelAndView("redirect:/trang-chu");
 	}
+   
+   
 	@RequestMapping(value = "/accessDenied", method = RequestMethod.GET)
 	public ModelAndView accessDenied() {
 		return new ModelAndView("redirect:/authen?accessDenied");
 	}
+	
+	
 	@GetMapping("/addProductHome")
 	public String addProductHome(Model model,@RequestParam("idProduct") Long idProduct,@RequestParam("quantity") Long quantity,HttpSession session) {
 		
 		try {
-		Account account = accountService.findByUserName(SecurityUtils.getPrincipal().getUsername());
-
-		Long addQuantity = quantity ;
-		Product product = productService.findByIdProduct(idProduct).get();
-		CartItem cartItem = cartItemRepository.findByAccountAndProduct(account, product);
-		
-		if(cartItem !=null ) {
-			addQuantity = cartItem.getQuantity()+quantity;
-			cartItem.setQuantity(addQuantity);
-			double total = cartItem.getQuantity()*product.getCost();
-			cartItem.setTotal(total);
-			
-			
-			
-		}else {
-			
-			cartItem = new CartItem();
-			cartItem.setAccount(account);
-			cartItem.setProduct(product);
-			cartItem.setQuantity(quantity);
-			double total = cartItem.getQuantity()*product.getCost();
-			cartItem.setTotal(total);
-			System.out.println(quantity+"aasas");
-		}
-		cartItemRepository.save(cartItem);
+			cartItemService.doAddProductToCart(idProduct, quantity);
 		}
 		catch (Exception e) {
 			   return "redirect:/authen";
-			}
-
-		
+			}		
 		return "redirect:/trang-chu";
 	}
 }

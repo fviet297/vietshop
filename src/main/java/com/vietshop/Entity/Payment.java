@@ -1,4 +1,4 @@
-package com.vietshop.entity;
+package com.vietshop.Entity;
 import java.util.Date;
 
 import javax.persistence.Entity;

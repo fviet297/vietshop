@@ -14,9 +14,9 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import com.vietshop.Service.imp.OrderService;
-import com.vietshop.entity.Order;
-import com.vietshop.entity.OrderDetails;
+import com.vietshop.Entity.OrderDetails;
+import com.vietshop.Service.impl.OrderService;
+import com.vietshop.dto.OrderDTO;
 
 @Controller
 public class ordersController {
@@ -41,14 +41,16 @@ public class ordersController {
 			PageRequest page_req = new PageRequest(currentPage, 10, Sort.Direction.DESC, sort.orElse("idOrder"));
 			pageable = page_req;
 		}
-		Page<Order> orderPage;
+		
+		Page<OrderDTO> orderPage;
+		
 		if (keyword.isPresent()) {
-			orderPage = orderService.searchOrder(keyword.get(), pageable);// Thực hiện chức năng tìm kiếm sản phẩm
+			orderPage = orderService.orderPage(keyword,pageable);// Thực hiện chức năng tìm kiếm sản phẩm
 			model.addAttribute("keyword", keyword.get());
 
 		} else {
 
-			orderPage = orderService.findAll(pageable);
+			orderPage = orderService.orderPage(pageable);
 		}
 		long size = orderPage.getTotalElements();
 		model.addAttribute("size", size);
@@ -75,17 +77,13 @@ public class ordersController {
 	}
 	@GetMapping("admin/successStatusHome")
 	public String successStatusHome(Model model,@RequestParam("idOrder") Long idOrder) {
-		Order order = orderService.findOne(idOrder);
-		order.setStatus("Đã thanh toán");
-		orderService.save(order);
+		orderService.successStatus(idOrder);
 		return "redirect:/admin/trang-chu";
 	}
 	
 	@GetMapping("admin/pendingStatusHome")
 	public String pendingStatusHome(Model model,@RequestParam("idOrder") Long idOrder) {
-		Order order = orderService.findOne(idOrder);
-		order.setStatus("Thanh toán khi nhận hàng");
-		orderService.save(order);
+		orderService.pendingStatus(idOrder);
 		return "redirect:/admin/trang-chu";
 	}
 	
@@ -93,9 +91,8 @@ public class ordersController {
 	public String successStatus(Model model,@RequestParam("idOrder") Long idOrder,@RequestParam("p")Optional<Integer> p) {
 		
 		int page = p.orElse(0);
-		Order order = orderService.findOne(idOrder);
-		order.setStatus("Đã thanh toán");
-		orderService.save(order);
+		orderService.successStatus(idOrder);
+
 		return "redirect:/admin/listOrder?p="+page;
 	}
 	
@@ -103,9 +100,7 @@ public class ordersController {
 	public String pendingStatus(Model model,@RequestParam("idOrder") Long idOrder,@RequestParam("p")Optional<Integer> p) {
 		
 		int page = p.orElse(0);
-		Order order = orderService.findOne(idOrder);
-		order.setStatus("Thanh toán khi nhận hàng");
-		orderService.save(order);
+		orderService.pendingStatus(idOrder);
 		return "redirect:/admin/listOrder?p="+page;
 	}
 	

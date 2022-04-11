@@ -7,8 +7,8 @@ import javax.persistence.Transient;
 
 import org.springframework.web.multipart.MultipartFile;
 
-import com.vietshop.entity.CartItem;
-import com.vietshop.entity.Category;
+import com.vietshop.Entity.CartItem;
+import com.vietshop.Entity.Category;
 
 public class ProductDTO {
 	public Category getCategory() {

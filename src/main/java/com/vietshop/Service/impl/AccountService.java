@@ -12,12 +12,12 @@ import org.springframework.data.domain.Sort;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import com.vietshop.Entity.Account;
-import com.vietshop.Entity.Role;
-import com.vietshop.Service.iAccountService;
 import com.vietshop.dto.AccountDTO;
 import com.vietshop.repository.AccountRepository;
 import com.vietshop.repository.RoleRepository;
+import com.vietshop.Entity.Account;
+import com.vietshop.Entity.Role;
+import com.vietshop.Service.iAccountService;
 @Service // Để class có thể thực hiện cơ chế DI và IOC
 public class AccountService implements iAccountService{
 	
@@ -83,8 +83,12 @@ public class AccountService implements iAccountService{
 	}
 
 	@Override
-	public Account findByUserName(String userName) {
-		return accountRepository.findByUserName(userName);
+	public AccountDTO findByUserName(String userName) {
+		Account account = accountRepository.findByUserName(userName);
+		AccountDTO accountDTO = new AccountDTO();
+		BeanUtils.copyProperties(account, accountDTO);
+		return accountDTO;
+				
 	}
 
 	@Override

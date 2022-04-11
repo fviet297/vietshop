@@ -6,7 +6,7 @@ import javax.persistence.Transient;
 
 import org.springframework.web.multipart.MultipartFile;
 
-import com.vietshop.entity.Product;
+import com.vietshop.Entity.Product;
 
 public class CategoryDTO {
 private Long idCategory;

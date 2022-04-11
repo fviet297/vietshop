@@ -18,24 +18,25 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import com.vietshop.Service.imp.AccountService;
-import com.vietshop.Service.imp.CategoryService;
-import com.vietshop.Service.imp.CreditCardService;
-import com.vietshop.Service.imp.OrderDetailsService;
-import com.vietshop.Service.imp.OrderService;
-import com.vietshop.Service.imp.ProductService;
-import com.vietshop.Service.imp.ShippingInfoService;
-import com.vietshop.entity.Account;
-import com.vietshop.entity.CartItem;
-import com.vietshop.entity.Category;
-import com.vietshop.entity.CreditCard;
-import com.vietshop.entity.Order;
-import com.vietshop.entity.OrderDetails;
-import com.vietshop.entity.Payment;
-import com.vietshop.entity.Product;
-import com.vietshop.entity.ShippingInfo;
 import com.vietshop.repository.PaymentRepository;
+import com.vietshop.Entity.Account;
+import com.vietshop.Entity.CartItem;
+import com.vietshop.Entity.Category;
+import com.vietshop.Entity.CreditCard;
+import com.vietshop.Entity.Order;
+import com.vietshop.Entity.OrderDetails;
+import com.vietshop.Entity.Payment;
+import com.vietshop.Entity.Product;
+import com.vietshop.Entity.ShippingInfo;
 import com.vietshop.Service.iCartItemService;
+import com.vietshop.Service.impl.AccountService;
+import com.vietshop.Service.impl.CategoryService;
+import com.vietshop.Service.impl.CreditCardService;
+import com.vietshop.Service.impl.OrderDetailsService;
+import com.vietshop.Service.impl.OrderService;
+import com.vietshop.Service.impl.ProductService;
+import com.vietshop.Service.impl.ShippingInfoService;
+import com.vietshop.dto.AccountDTO;
 import com.vietshop.util.SecurityUtils;
 
 @Controller
@@ -75,7 +76,7 @@ public class orderController {
 		List<Category> category = categoryService.findAll();
 		model.addAttribute("category", category);
 
-		Account account = accountService.findByUserName(SecurityUtils.getPrincipal().getUsername());
+		AccountDTO account = accountService.findByUserName(SecurityUtils.getPrincipal().getUsername());
 		List<CartItem> items = account.getCartItems();
 		model.addAttribute("cartItems", items);
 		model.addAttribute("account", account);
@@ -149,19 +150,19 @@ public class orderController {
 			orderService.save(order);
 			shippingInfoService.save(shipInfo);
 			
-			MimeMessage message = emailSender.createMimeMessage();
-			boolean multipart = true;
-			
-			MimeMessageHelper helper = new MimeMessageHelper(message, multipart, "utf-8");
-			String htmlMsg = "<a>Thank you for your order !</a>"+ 
-					"<a href='http://localhost:8080/vietshop/thankOrder?idOrder="+order.getIdOrder()+"'>Details</a>";   
-	        message.setContent(htmlMsg, "text/html");
-	        helper.setTo(account.getEmail());
-	        
-	        helper.setSubject("Order Success: "+"000"+order.getIdOrder());
-	        
-
-	        this.emailSender.send(message);
+//			MimeMessage message = emailSender.createMimeMessage();
+//			boolean multipart = true;
+//			
+//			MimeMessageHelper helper = new MimeMessageHelper(message, multipart, "utf-8");
+//			String htmlMsg = "<a>Thank you for your order !</a>"+ 
+//					"<a href='http://localhost:8080/vietshop/thankOrder?idOrder="+order.getIdOrder()+"'>Details</a>";   
+//	        message.setContent(htmlMsg, "text/html");
+//	        helper.setTo(account.getEmail());
+//	        
+//	        helper.setSubject("Order Success: "+"000"+order.getIdOrder());
+//	        
+//
+//	        this.emailSender.send(message);
 			// Trừ đi số lượng còn lại trong kho
 			for (CartItem i : cartItems) {
 				Long quantited = i.getProduct().getQuantity() - i.getQuantity();
@@ -194,7 +195,7 @@ public class orderController {
 	@GetMapping("paymentCard")
 	public String paymentCardPage(Model model, @RequestParam("idOrder") Long idOrder) {
 		model.addAttribute("idOrder", idOrder);
-		Account account = accountService.findByUserName(SecurityUtils.getPrincipal().getUsername());
+		AccountDTO account = accountService.findByUserName(SecurityUtils.getPrincipal().getUsername());
 		List<CartItem> items = account.getCartItems();
 		model.addAttribute("cartItems", items);
 		model.addAttribute("account", account);

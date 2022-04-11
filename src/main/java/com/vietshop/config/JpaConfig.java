@@ -54,7 +54,7 @@ public class JpaConfig {
 		dataSource.setDriverClassName("com.mysql.jdbc.Driver");
 		dataSource.setUrl("jdbc:mysql://localhost:3306/vshop?useSSL=false");
 		dataSource.setUsername("root");
-		dataSource.setPassword("121212");
+		dataSource.setPassword("kiki2011");
 		return dataSource;
 	}
 

@@ -1,6 +1,7 @@
 package com.vietshop.Service.impl;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,8 +12,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.vietshop.Entity.Order;
+import com.vietshop.Entity.OrderDetails;
 import com.vietshop.Service.iOrderService;
 import com.vietshop.dto.OrderDTO;
+import com.vietshop.dto.OrderDetailsDTO;
 import com.vietshop.repository.OrderRepository;
 
 @Service // Để class có thể thực hiện cơ chế DI và IOC
@@ -133,13 +136,14 @@ public class OrderService implements iOrderService{
 		return orderRepository.findRecentOrder(page);
 	}
 
-	public Page<Order> searchOrder(String keyword, Pageable pageable) {
-		return orderRepository.searchOrder(keyword, pageable);
-	}
+	
 
+	
 	public Page<Order> findRecentOrderByUsername(Pageable page, String username) {
 		return orderRepository.findRecentOrderByUsername(page, username);
 	}
+	
+	
 	public Page<OrderDTO> getLastOrder(){
 	PageRequest page_req = new PageRequest(0, 5);
     Pageable page = page_req;
@@ -152,6 +156,48 @@ public class OrderService implements iOrderService{
     return orderyDTOpage;
 	}
 	
+	public void pendingStatus(Long idOrder) {
+		Order order = orderRepository.findOne(idOrder);
+		order.setStatus("Thanh toán khi nhận hàng");
+		orderRepository.save(order);
+	}
 	
-		
+	public void successStatus(Long idOrder) {
+		Order order = orderRepository.findOne(idOrder);
+		order.setStatus("Đã thanh toán");
+		orderRepository.save(order);
+	}
+	
+	
+	public Page<OrderDTO> orderPage(Pageable pageable) {
+		Page<OrderDTO> orderDTOpage = orderRepository.findAll(pageable).map(Order -> {
+			OrderDTO orderDTO = new OrderDTO();
+			BeanUtils.copyProperties(Order, orderDTO);
+			return orderDTO;
+		});
+		return orderDTOpage;
+	}
+	
+	
+	public Page<OrderDTO> orderPage( Optional<String> keyword,Pageable pageable) {
+
+		Page<OrderDTO> orderDTOpage = orderRepository.searchOrder(keyword.get(),pageable).map(Order -> {
+			OrderDTO orderDTO = new OrderDTO();
+			BeanUtils.copyProperties(Order, orderDTO);
+			return orderDTO;
+		});
+
+		return orderDTOpage;
+	}
+	
+	
+//	public List<OrderDetailsDTO> orderList(Long idOrder){ 
+//		Order order = orderRepository.findOne(idOrder);
+//	List<OrderDetailsDTO> orderDetailsDTOlist = order.getOrderDetailsList().map(OrderDetails -> {
+//		OrderDetailsDTO orderDetailsDTO = new OrderDetailsDTO();
+//		BeanUtils.copyProperties(Category, categoryDTO);
+//		return categoryDTO;
+//	});
+//	return orderDetailsDTOlist;
+//	}
 }
