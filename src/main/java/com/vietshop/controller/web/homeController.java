@@ -3,7 +3,6 @@ package com.vietshop.controller.web;
 import java.text.DecimalFormat;
 import java.util.List;
 
-import javax.mail.internet.MimeMessage;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -12,9 +11,6 @@ import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -30,26 +26,24 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
-import com.vietshop.repository.CartItemRepository;
 import com.vietshop.Entity.Account;
 import com.vietshop.Entity.CartItem;
 import com.vietshop.Entity.Category;
-import com.vietshop.Entity.Product;
-import com.vietshop.Entity.Role;
-import com.vietshop.Service.iAccountService;
+import com.vietshop.Service.impl.AccountService;
 import com.vietshop.Service.impl.CartItemService;
 import com.vietshop.Service.impl.CategoryService;
 import com.vietshop.Service.impl.OrderService;
 import com.vietshop.Service.impl.ProductService;
 import com.vietshop.Service.impl.RoleService;
 import com.vietshop.dto.AccountDTO;
+import com.vietshop.dto.ProductDTO;
 import com.vietshop.util.SecurityUtils;
 
 
 @Controller(value = "homeControllerOfWeb")
 public class homeController {
   @Autowired
-  public iAccountService accountService;
+  public AccountService accountService;
   @Autowired
 	CategoryService categoryService;
 	@Autowired
@@ -62,8 +56,7 @@ public class homeController {
 	public ProductService productService;
 	@Autowired
 	private CartItemService cartItemService;
-	@Autowired
-    public JavaMailSender emailSender;
+	
 
    @RequestMapping(value = "/trang-chu", method = RequestMethod.GET)
    public String homePage(Model model,HttpSession session) {
@@ -96,23 +89,22 @@ public class homeController {
 					DecimalFormat formatter = new DecimalFormat("###,###,###.##");
 					model.addAttribute("formatter",formatter);
 					// Get sp bán chạy
-				      PageRequest page_req = new PageRequest(0, 8);
-				      Pageable page = page_req;
-				      Page<Product> topProduct = productService.findTopProduct("display",page);
+					PageRequest page_req = new PageRequest(0, 8);
+
+				      Page<ProductDTO> topProduct = productService.findTopProduct("display",page_req);
 				      model.addAttribute("topProduct",topProduct);
 				   // Get sp mới nhất			      
-				      Page<Product> lastProduct = productService.findLastProduct("display",page);
+				      Page<ProductDTO> lastProduct = productService.findLastProduct("display",page_req);
 				      model.addAttribute("lastProduct",lastProduct);
 					return "web/home";
 				}
 				// Get sp bán chạy
-			      PageRequest page_req = new PageRequest(0, 8);
-			      Pageable page = page_req;
-			      Page<Product> topProduct = productService.findTopProduct("display",page);
+				PageRequest page_req = new PageRequest(0, 8);
+
+			      Page<ProductDTO> topProduct = productService.findTopProduct("display",page_req);
 			      model.addAttribute("topProduct",topProduct);
-			      
 			   // Get sp mới nhất			      
-			      Page<Product> lastProduct = productService.findLastProduct("display",page);
+			      Page<ProductDTO> lastProduct = productService.findLastProduct("display",page_req);
 			      model.addAttribute("lastProduct",lastProduct);
       return "web/home";
    }
@@ -126,7 +118,7 @@ public class homeController {
    
    
    @PostMapping("/authen/doregister")
-   public String doregister(Model model,@ModelAttribute("account") @Valid Account account,BindingResult result) {
+   public String doregister(Model model,@ModelAttribute("account") @Valid AccountDTO account,BindingResult result) {
 	  
 	try {
 		if(result.hasErrors()) {
@@ -143,30 +135,8 @@ public class homeController {
 			model.addAttribute("messageEmail","Email đã được sử dụng");
 			return "register";
 		}
-		   Account newAcc=new Account();
-		   Role role = new Role();
-		   role.setIdRole(2);
-		   newAcc.setUserName(account.getUserName());
-		   newAcc.setPassword(passwordEncoder.encode(account.getPassword()));
-		   newAcc.setDob(account.getDob());
-		   newAcc.setAddress(account.getAddress());
-		   newAcc.setFullName(account.getFullName());
-		   newAcc.setPhone(account.getPhone());
-		   newAcc.setEmail(account.getEmail());
-		   newAcc.setStatus(1);
-		   newAcc.setRole(role);
-		   accountService.save(newAcc);
+		   accountService.register(account);
 		   
-		   MimeMessage message = emailSender.createMimeMessage();
-			boolean multipart = true;
-			
-			MimeMessageHelper helper = new MimeMessageHelper(message, multipart, "utf-8");
-			String htmlMsg = "<a>Đăng ký tài khoản vShop thành công</a>"+ "<br>"+
-					"<a href='http://localhost:8080/vietshop/trang-chu'>Go to vShop</a>";   
-	        message.setContent(htmlMsg, "text/html");
-	        helper.setTo(newAcc.getEmail());
-	        helper.setSubject("Đăng ký tài khoản vShop thành công");
-	        this.emailSender.send(message);
 	} catch(Exception e) {
 		return "Error";
 	}

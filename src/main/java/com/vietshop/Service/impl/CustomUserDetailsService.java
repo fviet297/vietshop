@@ -12,7 +12,6 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import com.vietshop.Entity.Account;
-import com.vietshop.Entity.Role;
 import com.vietshop.constant.SystemConstant;
 import com.vietshop.dto.MyUserDTO;
 import com.vietshop.repository.AccountRepository;
@@ -42,6 +41,7 @@ public class CustomUserDetailsService implements UserDetailsService {
 		MyUserDTO myUser = new MyUserDTO(account.getUserName(), account.getPassword(), true, true, true, true,
 				authorities);
 		myUser.setFullName(account.getFullName());
+		myUser.setIdAccount(account.getId());
 		return myUser; // Vì UserDetail là 1 interface mà class User implements, trong khi myUser
 						// extends User nên kết quả trả về là myUser
 	}

@@ -7,7 +7,6 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import com.vietshop.Entity.Order;
-import com.vietshop.Entity.Product;
 
 public interface OrderRepository extends JpaRepository<Order,Long>{
 	@Query("SELECT p FROM Order p WHERE p.account.userName = :userName")

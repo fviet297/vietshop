@@ -14,7 +14,6 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.vietshop.Entity.Category;
-import com.vietshop.Entity.Order;
 import com.vietshop.Entity.Product;
 
 @Repository

@@ -12,11 +12,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.vietshop.Entity.Order;
-import com.vietshop.Entity.OrderDetails;
 import com.vietshop.Service.iOrderService;
 import com.vietshop.dto.OrderDTO;
-import com.vietshop.dto.OrderDetailsDTO;
 import com.vietshop.repository.OrderRepository;
+import com.vietshop.util.SecurityUtils;
 
 @Service // Để class có thể thực hiện cơ chế DI và IOC
 public class OrderService implements iOrderService{
@@ -40,8 +39,11 @@ public class OrderService implements iOrderService{
 
 
 	@Override
-	public Order findOne(Long id) {
-		return orderRepository.findOne(id);
+	public OrderDTO findOne(Long id) {
+		Order order = orderRepository.findOne(id);
+		OrderDTO orderDTO = new OrderDTO();
+		BeanUtils.copyProperties(order, orderDTO);
+		return orderDTO;
 	}
 
 
@@ -190,6 +192,19 @@ public class OrderService implements iOrderService{
 		return orderDTOpage;
 	}
 	
+	
+	public Page<OrderDTO> mylistOrder(Optional<Integer> p){
+		int currentPage = p.orElse(0);
+		PageRequest page_req = new PageRequest(currentPage, 10);
+		Pageable page = page_req;
+		Page<OrderDTO> pageOrderDTO = orderRepository.findRecentOrderByUsername(page,
+				SecurityUtils.getPrincipal().getUsername()).map(Order->{
+					OrderDTO orderDTO = new OrderDTO();
+					BeanUtils.copyProperties(Order, orderDTO);
+					return orderDTO;
+				});
+		return pageOrderDTO;
+	}
 	
 //	public List<OrderDetailsDTO> orderList(Long idOrder){ 
 //		Order order = orderRepository.findOne(idOrder);

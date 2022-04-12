@@ -26,7 +26,7 @@ public interface iProductService {
 
 	<S extends Product> List<S> findAll(long pageIndex, long pageSize);
 
-	Page<Product> findProducts(String status,Pageable pageable);
+	Page<ProductDTO> findProducts(String status,Pageable pageable);
 
 	Page<Product> searchProduct(String keyword, Pageable pageable);
 
@@ -68,7 +68,7 @@ public interface iProductService {
 
 	List<Product> findAll(Sort sort);
 
-	Page<Product> findAllByIdCategory(String status,Long idCategory, Pageable pageable);
+	Page<ProductDTO> findAllByIdCategory(String status,Long idCategory, Pageable pageable);
 	
 	Page<ProductDTO> findAllByIdCategoryAll(Category category, Pageable pageable);
 
@@ -80,7 +80,7 @@ public interface iProductService {
 
 	List<Product> findAll();
 
-	Page<Product> listRelatedProduct(Long idCategory, Pageable pageable, Long idProduct,String status);
+	Page<ProductDTO> listRelatedProduct(Long idCategory, Pageable pageable, Long idProduct,String status);
 
 	Page<ProductDTO> findAllProduct(Pageable pageable);
 

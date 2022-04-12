@@ -7,6 +7,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import com.vietshop.Entity.Order;
+import com.vietshop.dto.OrderDTO;
 
 public interface iOrderService {
 
@@ -45,7 +46,7 @@ public interface iOrderService {
 
 	
 
-	Order findOne(Long id);
+	OrderDTO findOne(Long id);
 
 
 	Page<Order> findAll(Pageable pageable);

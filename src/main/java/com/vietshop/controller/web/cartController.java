@@ -39,11 +39,14 @@ public class cartController {
 	public String Cart(Model model,HttpSession session,@RequestParam(name = "msg" ,defaultValue = "") String msg) {		
 		List<Category> category = categoryService.findAll();
 		model.addAttribute("category", category);
+		
 		AccountDTO account = accountService.findByUserName(SecurityUtils.getPrincipal().getUsername());
 		List<CartItem> items = account.getCartItems();
+		
 		model.addAttribute("cartItems",items);
 		model.addAttribute("account",account);
 		model.addAttribute("msg",msg);
+		
 		// tính tôgnr giỏ hàng
 				double priceTotal = 0;
 				for (CartItem i:items) {
@@ -69,6 +72,7 @@ public class cartController {
 		catch (Exception e) {
 			   return "redirect:/authen";
 			}
+		
 		return "redirect:/shop-grid";
 	}
 	

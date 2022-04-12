@@ -9,6 +9,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
@@ -17,6 +18,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.vietshop.Entity.Category;
 import com.vietshop.Entity.Product;
 import com.vietshop.Service.iProductService;
+import com.vietshop.dto.AccountDTO;
 import com.vietshop.dto.CategoryDTO;
 import com.vietshop.dto.ProductDTO;
 import com.vietshop.repository.CategoryRepository;
@@ -24,15 +26,13 @@ import com.vietshop.repository.ProductRepository;
 
 @Service // Để class có thể thực hiện cơ chế DI và IOC
 public class ProductService implements iProductService {
-	public Page<Product> findLastProduct(String status,Pageable page) {
-		return productRepository.findLastProduct(status,page);
-	}
 
 	@Autowired
 	private ProductRepository productRepository;
-	
+
 	@Autowired
 	private CategoryRepository categoryRepository;
+
 	@Override
 	public <S extends Product> S save(S entity) {
 		return productRepository.save(entity);
@@ -43,21 +43,25 @@ public class ProductService implements iProductService {
 		return productRepository.findOne(example);
 	}
 
-	
 	public Page<ProductDTO> findAllProduct(Pageable pageable) {
-		
-		Page<ProductDTO> pageAllProduct = productRepository.findAllProduct(pageable).map(Product->{
+
+		Page<ProductDTO> pageAllProduct = productRepository.findAllProduct(pageable).map(Product -> {
 			ProductDTO productDTO = new ProductDTO();
 			BeanUtils.copyProperties(Product, productDTO);
 			return productDTO;
 		});
 		return pageAllProduct;
-		
+
 	}
 
 	@Override
-	public Page<Product> listRelatedProduct(Long idCategory, Pageable pageable, Long idProduct,String status) {
-		return productRepository.listRelatedProduct(idCategory, pageable, idProduct,status);
+	public Page<ProductDTO> listRelatedProduct(Long idCategory, Pageable pageable, Long idProduct, String status) {
+		Page<ProductDTO> pageProductDTO = productRepository.listRelatedProduct(idCategory, pageable, idProduct, status).map(Product->{
+			ProductDTO productDTO = new ProductDTO();
+			BeanUtils.copyProperties(Product, productDTO);
+			return productDTO;
+		});
+		return pageProductDTO;
 	}
 
 	@Override
@@ -70,29 +74,31 @@ public class ProductService implements iProductService {
 		return productRepository.findByIdProduct(idProduct);
 	}
 
-	
-
 	@Override
 	public Product findOne(Long id) {
 		return productRepository.findOne(id);
 	}
 
 	@Override
-	public Page<Product> findAllByIdCategory(String status,Long idCategory, Pageable pageable) {
-		return productRepository.findAllByIdCategory(status,idCategory, pageable);
-	}
-	
-	
-	public Page<ProductDTO> findAllByCategory(CategoryDTO categoryDTO, Pageable pageable) {
-		Category category = new Category();
-		BeanUtils.copyProperties(categoryDTO, category);
-		Page<ProductDTO> pageProductDTO = productRepository.findByCategory(category, pageable).map(Product->{
+	public Page<ProductDTO> findAllByIdCategory(String status, Long idCategory, Pageable pageable) {
+		Page<ProductDTO> pageProductDTO = productRepository.findAllByIdCategory(status, idCategory, pageable).map(Product->{
 			ProductDTO productDTO = new ProductDTO();
 			BeanUtils.copyProperties(Product, productDTO);
 			return productDTO;
 		});
-				return pageProductDTO;
-	
+		return pageProductDTO;
+	}
+
+	public Page<ProductDTO> findAllByCategory(CategoryDTO categoryDTO, Pageable pageable) {
+		Category category = new Category();
+		BeanUtils.copyProperties(categoryDTO, category);
+		Page<ProductDTO> pageProductDTO = productRepository.findByCategory(category, pageable).map(Product -> {
+			ProductDTO productDTO = new ProductDTO();
+			BeanUtils.copyProperties(Product, productDTO);
+			return productDTO;
+		});
+		return pageProductDTO;
+
 	}
 
 	@Override
@@ -155,7 +161,6 @@ public class ProductService implements iProductService {
 		productRepository.delete(entity);
 	}
 
-	
 	public ProductDTO getOne(Long id) {
 		Product product = productRepository.findOne(id);
 		ProductDTO productDTO = new ProductDTO();
@@ -188,29 +193,30 @@ public class ProductService implements iProductService {
 		return productRepository.exists(example);
 	}
 
-	
-
-	 @Override
+	@Override
 	public Product get(Long idProduct) {
-	        return productRepository.findByIdProduct(idProduct).get();
-	    }
+		return productRepository.findByIdProduct(idProduct).get();
+	}
 
-	
-	
-
-	public Page<ProductDTO> searchProduct(Optional<String> keyword,Pageable pageable) {
-		Page<ProductDTO> pageProductDTO = productRepository.searchProduct(keyword.get(),pageable).map(Product ->{
+	public Page<ProductDTO> searchProduct(Optional<String> keyword, Pageable pageable) {
+		Page<ProductDTO> pageProductDTO = productRepository.searchProduct(keyword.get(), pageable).map(Product -> {
 			ProductDTO productDTO = new ProductDTO();
 			BeanUtils.copyProperties(Product, productDTO);
 			return productDTO;
 		});
 		return pageProductDTO;
-		
+
 	}
 
 	@Override
-	public Page<Product> findProducts(String status,Pageable pageable) {
-		return productRepository.findProducts(status,pageable);
+	public Page<ProductDTO> findProducts(String status, Pageable pageable) {
+		Page<ProductDTO> pageProductDTO = productRepository.findProducts(status, pageable).map(Product->{
+			ProductDTO productDTO = new ProductDTO();
+			BeanUtils.copyProperties(Product, productDTO);
+			return productDTO;
+		});
+		
+		return pageProductDTO;
 	}
 
 	@Override
@@ -248,11 +254,10 @@ public class ProductService implements iProductService {
 		// TODO Auto-generated method stub
 		return null;
 	}
+
 	public void addProduct(ProductDTO productDto) throws Exception, IOException {
 		Product product = new Product();
-		
-		
-		
+
 		Category category = new Category();
 
 		category.setIdCategory(productDto.getIdCategory());
@@ -261,13 +266,12 @@ public class ProductService implements iProductService {
 //		String saveImgUrl = "/Users/macbook/eclipse-workspace/vietshop/src/main/webapp/resources/images";
 		String saveImgUrl = "D:/Java/workspace/vietshop/src/main/webapp/resources/images";
 
-	
-			MultipartFile multipartFile = productDto.getImageFile();
-			String fileImg = multipartFile.getOriginalFilename();
-			File file = new File(saveImgUrl, fileImg);
-			multipartFile.transferTo(file);
-			productDto.setImgUrl("/resources/images/" + fileImg);// Set đường dẫn lưu trên DB
-			
+		MultipartFile multipartFile = productDto.getImageFile();
+		String fileImg = multipartFile.getOriginalFilename();
+		File file = new File(saveImgUrl, fileImg);
+		multipartFile.transferTo(file);
+		productDto.setImgUrl("/resources/images/" + fileImg);// Set đường dẫn lưu trên DB
+
 		BeanUtils.copyProperties(productDto, product);
 //		product.setSoldQuantity(0L); // set giá trị ban đầu cho soldquantity để hiển thị
 //		// Chuyển đổi tiền tệ VNĐ
@@ -278,11 +282,26 @@ public class ProductService implements iProductService {
 
 	}
 
-	public Page<Product> findTopProduct(String status,Pageable page) {
-		return productRepository.findTopProduct(status,page);
+	public Page<ProductDTO> findTopProduct(String status,PageRequest page_req) {
+		Pageable page = page_req;
+		Page<ProductDTO> pageProductDTO = productRepository.findTopProduct(status, page).map(Product -> {
+			ProductDTO productDTO = new ProductDTO();
+			BeanUtils.copyProperties(Product, productDTO);
+			return productDTO;
+		});
+		return pageProductDTO;
 	}
-	
-	
+
+	public Page<ProductDTO> findLastProduct(String status,PageRequest page_req) {
+		Pageable page = page_req;
+		Page<ProductDTO> pageProductDTO = productRepository.findLastProduct(status, page).map(Product -> {
+			ProductDTO productDTO = new ProductDTO();
+			BeanUtils.copyProperties(Product, productDTO);
+			return productDTO;
+		});
+		return pageProductDTO;
+	}
+
 	public ProductDTO getProductDTO(Long idProduct) {
 		Product product = productRepository.getOne(idProduct);
 		ProductDTO productDTO = new ProductDTO();
@@ -290,16 +309,16 @@ public class ProductService implements iProductService {
 		BeanUtils.copyProperties(product, productDTO);
 		return productDTO;
 	}
-	
-	
+
 	public void changeStatus(ProductDTO productDTO) {
 		Product product = new Product();
 		BeanUtils.copyProperties(productDTO, product);
 		productRepository.save(product);
 	}
-	
-	public void updateProduct(ProductDTO productDTO,Long addQuantity) {
-		Product product = productRepository.getOne(productDTO.getIdProduct()); // Get ra entity có id theo DTO nhận từ view
+
+	public void updateProduct(ProductDTO productDTO, Long addQuantity) {
+		Product product = productRepository.getOne(productDTO.getIdProduct()); // Get ra entity có id theo DTO nhận từ
+																				// view
 
 		productDTO.setQuantity(product.getQuantity() + addQuantity);// Theem so luong sp
 		productDTO.setStatus(product.getStatus());
@@ -321,8 +340,8 @@ public class ProductService implements iProductService {
 		} catch (Exception e) {
 			System.out.println(e);
 		}
-		
-		if(productDTO.getImageFile().isEmpty()) {
+
+		if (productDTO.getImageFile().isEmpty()) {
 			productDTO.setImgUrl(product.getImgUrl());
 		}
 
@@ -330,15 +349,13 @@ public class ProductService implements iProductService {
 		productRepository.save(product);
 
 	}
-	
-	
+
 	public void doHideProduct(Long idProduct) {
 		Product product = productRepository.getOne(idProduct);
 		product.setStatus("hide");
 		productRepository.save(product);
 	}
-	
-	
+
 	public void doDisplayProduct(Long idProduct) {
 		Product product = productRepository.getOne(idProduct);
 		product.setStatus("display");
@@ -357,5 +374,6 @@ public class ProductService implements iProductService {
 		return null;
 	}
 	
-}
 	
+
+}

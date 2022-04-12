@@ -4,20 +4,18 @@ import java.util.List;
 
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Service;
 
-import com.vietshop.repository.AccountRepository;
-import com.vietshop.repository.CartItemRepository;
-import com.vietshop.repository.ProductRepository;
-import com.vietshop.util.SecurityUtils;
 import com.vietshop.Entity.Account;
 import com.vietshop.Entity.CartItem;
 import com.vietshop.Entity.Product;
 import com.vietshop.Service.iCartItemService;
 import com.vietshop.dto.AccountDTO;
 import com.vietshop.dto.CartItemDTO;
-import com.vietshop.dto.ProductDTO;
+import com.vietshop.repository.AccountRepository;
+import com.vietshop.repository.CartItemRepository;
+import com.vietshop.repository.ProductRepository;
+import com.vietshop.util.SecurityUtils;
 
 @Service
 public class CartItemService implements iCartItemService{

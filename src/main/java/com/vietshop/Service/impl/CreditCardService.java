@@ -2,6 +2,7 @@ package com.vietshop.Service.impl;
 
 import java.util.List;
 
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Page;
@@ -10,6 +11,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import com.vietshop.Entity.CreditCard;
+import com.vietshop.dto.CreditCardDTO;
 import com.vietshop.repository.CreditCardRepository;
 
 @Service
@@ -118,5 +120,12 @@ public CreditCard findByCardNumber(String cardNumber) {
 	return careditCardRepo.findByCardNumber(cardNumber);
 }
 
+
+public CreditCardDTO findOneDTO(String cardNumber) {
+	CreditCard creditCard = careditCardRepo.findByCardNumber(cardNumber);
+	CreditCardDTO creditCardDTO = new CreditCardDTO();
+	BeanUtils.copyProperties(creditCard, creditCardDTO);
+	return creditCardDTO;
+}
 
 }

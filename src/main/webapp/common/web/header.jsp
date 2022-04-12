@@ -64,9 +64,7 @@
 						<li><a href="#">Pages</a>
 							<ul class="header__menu__dropdown">
 								<li><a href="./shop-details.html">Shop sDetails</a></li>
-								<li><a href="./shoping-cart.html">Shoping Cart</a></li>
-								<li><a href="./checkout.html">Check Out</a></li>
-								<li><a href="./blog-details.html">Blog Details</a></li>
+								<li><a href="shopingcart">Giỏ hàng của tôi</a></li>
 							</ul></li>
 						<li><a href="./blog.html">Bài viết</a></li>
 						<li><a href="./contact.html">Liên hệ</a></li>
