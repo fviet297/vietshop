@@ -43,7 +43,9 @@
 										<input type="text" required="required" name="name" /> <input
 											type="hidden" value="${order.account.id}" name="idAccount" />
 										<input type="hidden" value="${order.idOrder}" name="idOrder" />
-
+										<input type="hidden" value="${fullname}" name="fullname" /> <input
+											type="hidden" value="${phone}" name="phone" /> <input
+											type="hidden" value="${address}" name="address" />
 									</div>
 								</div>
 
@@ -86,7 +88,7 @@
 						</div>
 
 						<button type="submit" class="site-btn"
-							style="position: absolute; top: 832px; right: 963px; left: 744px;">THANH
+							style="position: absolute; top: 870px; right: 963px; left: 500px; width: 125px;">THANH
 							TOÁN</button>
 				</form>
 			</div>

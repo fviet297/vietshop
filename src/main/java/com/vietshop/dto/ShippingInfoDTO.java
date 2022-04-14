@@ -1,6 +1,22 @@
 package com.vietshop.dto;
 
 public class ShippingInfoDTO {
+	public String getEmail() {
+		return email;
+	}
+
+	public void setEmail(String email) {
+		this.email = email;
+	}
+
+	public OrderDTO getOrderDTO() {
+		return orderDTO;
+	}
+
+	public void setOrderDTO(OrderDTO orderDTO) {
+		this.orderDTO = orderDTO;
+	}
+
 	private Long id;
 	
 	private String customer;
@@ -8,6 +24,9 @@ public class ShippingInfoDTO {
 	private String phone;
 	
 	private String address;
+	
+	private String email;
+
 	
 	private String shippingType;
 	

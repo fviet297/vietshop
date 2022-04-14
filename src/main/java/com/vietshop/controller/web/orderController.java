@@ -167,9 +167,9 @@ public class orderController {
 			@RequestParam("idAccount") Long idAccount, @RequestParam("idOrder") Long idOrder) {
 		OrderDTO orderDTO = orderService.findOne(idOrder);
 
-		CreditCardDTO creditCardDTO = creditcardService.findOneDTO(cardNumber);
-		System.out.println(creditCardDTO.getCardNumber());
 		try {
+			CreditCardDTO creditCardDTO = creditcardService.findOneDTO(cardNumber);
+
 			double balance = creditCardDTO.getBalance();
 
 			double totalPrice = orderDTO.getSubTotal();
@@ -180,7 +180,7 @@ public class orderController {
 					&& cvcCode == creditCardDTO.getCvcCode()) {
 				// thêm dữ liệu vào shipping info
 				if (balanceAfter >= 0) {
-					creditCardDTO.setBalance(balanceAfter);// set lai balance sau khi gioa dich
+					creditcardService.setbalance(cardNumber, balanceAfter);// set lai balance sau khi gioa dich
 					paymentService.insert(orderDTO, creditCardDTO, idAccount);
 					shippingInfoService.insert(idAccount, idOrder,"Đã thanh toán",0);
 					model.addAttribute("order", orderDTO);

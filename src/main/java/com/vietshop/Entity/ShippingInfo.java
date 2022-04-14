@@ -20,6 +20,7 @@ public class ShippingInfo {
 	
 	private String address;
 	
+	
 	private String shippingType;
 	
 	private double shippingCost;

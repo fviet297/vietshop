@@ -128,4 +128,11 @@ public CreditCardDTO findOneDTO(String cardNumber) {
 	return creditCardDTO;
 }
 
+public void setbalance(String cardNumber,double balaned) {
+	CreditCard creditCard = careditCardRepo.findByCardNumber(cardNumber);
+	creditCard.setBalance(balaned);
+	
+	careditCardRepo.save(creditCard);
+}
+
 }

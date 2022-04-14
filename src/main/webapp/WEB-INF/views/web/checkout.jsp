@@ -45,19 +45,12 @@
 											type="hidden" value="${order.account.id}" name="idAccount" />
 											 <input
 											type="hidden" value="${order.dateOrder}" name="dateorder" />
+											<input
+											type="hidden" value="${order}" name="order" />
 									</div>
 								</div>
 
 							</div>
-
-							<div class="checkout__input">
-								<p>
-									Địa chỉ<span>*</span>
-								</p>
-								<input type="text" placeholder="${order.account.address }"
-									value="${order.account.address }" name="address"/>
-							</div>
-
 							<div class="row">
 								<div class="col-lg-6">
 									<div class="checkout__input">
@@ -68,14 +61,23 @@
 											value="${order.account.phone }" name="phone"/>
 									</div>
 								</div>
+							<div class="checkout__input">
+								<p>
+									Địa chỉ<span>*</span>
+								</p>
+								<input type="text" placeholder="${order.account.address }"
+									value="${order.account.address }" name="address"/>
+							</div>
+
+							
 								<div class="col-lg-6">
-									<div class="checkout__input">
-										<p>
-											Email<span>*</span>
-										</p>
-										<input type="text" placeholder="${order.account.email }"
-											value="${order.account.email }" name="email">
-									</div>
+<!-- 									<div class="checkout__input"> -->
+<!-- 										<p> -->
+<!-- 											Email<span>*</span> -->
+<!-- 										</p> -->
+<%-- 										<input type="text" placeholder="${order.account.email }" --%>
+<%-- 											value="${order.account.email }" name="email"> --%>
+<!-- 									</div> -->
 								</div>
 							</div>
 
